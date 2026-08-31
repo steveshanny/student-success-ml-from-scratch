@@ -4,11 +4,14 @@ PCA & Logistic Regression implemented from scratch with NumPy.
 """
 
 import os
+import sys
 import numpy as np
 import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from src.preprocessing import StandardScalerScratch
 from src.pca_scratch import PCAFromScratch
@@ -25,11 +28,10 @@ from src.metrics import (
 # Configuration
 st.set_page_config(
     page_title="Student Success ML From Scratch",
-    page_icon="🎓",
     layout="wide",
 )
 
-st.title("🎓 Prédiction de la Réussite Académique des Étudiants")
+st.title(" Prédiction de la Réussite Académique des Étudiants")
 st.markdown(
     "**Analyse en Composantes Principales (ACP) & Régression Logistique avec régularisation L2 — Implémentation From Scratch en NumPy**"
 )
@@ -59,12 +61,12 @@ st.sidebar.image("https://img.icons8.com/isometric-folders/100/graduation-cap.pn
 st.sidebar.title("Navigation")
 menu = st.sidebar.radio(
     "Accéder aux sections :",
-    ["📊 Dashboard", "📁 Dataset", "📉 ACP (PCA)", "⚙️ Entraînement", "📈 Évaluation", "🔮 Prédiction Individuelle"],
+    ["Dashboard", "Dataset", "ACP (PCA)", "Entraînement", "Évaluation", "Prédiction Individuelle"],
 )
 
 # 1. DASHBOARD
-if menu == "📊 Dashboard":
-    st.header("📊 Tableau de Bord Général")
+if menu == "Dashboard":
+    st.header("Tableau de Bord Général")
     col1, col2, col3, col4, col5 = st.columns(5)
     col1.metric("Étudiants Total", f"{len(df_raw)}")
     col2.metric("Variables (Features)", f"{len(feature_names)}")
@@ -82,15 +84,15 @@ if menu == "📊 Dashboard":
     col5.metric("F1-Score (Test)", f"{f1 * 100:.1f}%")
 
     st.markdown("---")
-    st.subheader("🎯 Objectif du Projet")
+    st.subheader("Objectif du Projet")
     st.info(
         "Ce projet démontre l'implémentation vectorisée from scratch des algorithmes d'Analyse en Composantes Principales (ACP) "
         "et de Régression Logistique (avec régularisation L2 et descente de gradient) en NumPy, appliqués à la prédiction de la réussite académique."
     )
 
 # 2. DATASET
-elif menu == "📁 Dataset":
-    st.header("📁 Exploration des Données Académiques")
+elif menu == "Dataset":
+    st.header("Exploration des Données Académiques")
     st.subheader("Aperçu du Dataset Brut (UCI Student Performance)")
     st.dataframe(df_raw.head(10), use_container_width=True)
 
@@ -109,8 +111,8 @@ elif menu == "📁 Dataset":
         st.pyplot(fig)
 
 # 3. ACP (PCA)
-elif menu == "📉 ACP (PCA)":
-    st.header("📉 Analyse en Composantes Principales (ACP) From Scratch")
+elif menu == "ACP (PCA)":
+    st.header("Analyse en Composantes Principales (ACP) From Scratch")
     pca = PCAFromScratch(n_components=2)
     Z = pca.fit_transform(X_train_scaled)
 
@@ -143,8 +145,8 @@ elif menu == "📉 ACP (PCA)":
     st.success(f"PC1 explique {pca.explained_variance_ratio_[0]*100:.2f}% de la variance et PC2 explique {pca.explained_variance_ratio_[1]*100:.2f}%.")
 
 # 4. TRAINING
-elif menu == "⚙️ Entraînement":
-    st.header("⚙️ Entraînement et Analyse de Convergence")
+elif menu == "Entraînement":
+    st.header("Entraînement et Analyse de Convergence")
 
     st.sidebar.subheader("Hyperparamètres du Modèle")
     lr = st.sidebar.slider("Pas d'apprentissage (alpha)", 0.001, 1.0, 0.1, step=0.01)
@@ -174,8 +176,8 @@ elif menu == "⚙️ Entraînement":
         st.dataframe(weights_df, use_container_width=True)
 
 # 5. EVALUATION
-elif menu == "📈 Évaluation":
-    st.header("📈 Évaluation des Performances de Classification")
+elif menu == "Évaluation":
+    st.header("Évaluation des Performances de Classification")
 
     model = LogisticRegressionScratch(learning_rate=0.1, l2_lambda=0.1, n_iterations=1000)
     model.fit(X_train_scaled, y_train)
@@ -221,8 +223,8 @@ elif menu == "📈 Évaluation":
         st.pyplot(fig)
 
 # 6. PREDICTION INDIVIDUELLE
-elif menu == "🔮 Prédiction Individuelle":
-    st.header("🔮 Simulation de Prédiction pour un Étudiant")
+elif menu == "Prédiction Individuelle":
+    st.header("Simulation de Prédiction pour un Étudiant")
     st.markdown("Ajustez les caractéristiques de l'étudiant pour simuler son estimation de réussite académique :")
 
     scaler = StandardScalerScratch()
@@ -272,8 +274,8 @@ elif menu == "🔮 Prédiction Individuelle":
 
     with res_col2:
         if pred_class == 1:
-            st.success("🎓 **Classe Prédite : Réussite Académique**")
+            st.success("**Classe Prédite : Réussite Académique**")
         else:
-            st.error("⚠️ **Classe Prédite : Non-réussite Académique**")
+            st.error("**Classe Prédite : Non-réussite Académique**")
 
-    st.warning("⚠️ **Avertissement Légal & Académique :** Cette prédiction est issue d'un modèle expérimental à visée pédagogique et ne constitue en aucun cas une décision académique réelle ou un diagnostic d'orientation.")
+    st.warning("**Avertissement Légal & Académique :** Cette prédiction est issue d'un modèle expérimental à visée pédagogique et ne constitue en aucun cas une décision académique réelle ou un diagnostic d'orientation.")

@@ -1,14 +1,14 @@
-# Student Success ML From Scratch 🎓
+# Student Success ML From Scratch
 
 > **Prédiction de la réussite académique des étudiants par Analyse en Composantes Principales (ACP) et Régression Logistique avec régularisation L2 : implémentation et analyse mathématique vectorisée from scratch avec NumPy.**
 
 ---
 
-## 📌 Contextualisation & Objectifs Pédagogiques
+## Contextualisation & Objectifs Pédagogiques
 
 Ce projet individuel universitaire de **Mathématiques Appliquées et Machine Learning** a pour but de comprendre les fondements théoriques et matriciels des algorithmes d'apprentissage automatique et de les implémenter **intégralement from scratch en Python avec NumPy** (sans aucune boucle sur les observations).
 
-### 🎯 Compétences Démontrées :
+### Compétences Démontrées :
 1. **Algèbre Linéaire & ACP :** Centrage-réduction, calcul de la matrice de covariance empirique $\Sigma = \frac{1}{m} X^T X$, décomposition en valeurs et vecteurs propres ($\Sigma v_i = \lambda_i v_i$), maximisation de la variance projetée via le Lagrangien, et projection $Z = XW$.
 2. **Calcul Différentiel & Optimisation :** Activation sigmoïde numérique stable, Log-Loss avec régularisation L2 (Ridge), gradient analytique matriciel $\nabla J(\theta) = \frac{1}{m} X^T (\hat{y} - y) + \frac{\lambda}{m} \theta$, et descente de gradient vectorisée.
 3. **Analyse Expérimentale :** Effet du pas d'apprentissage ($\alpha$), impact de la standardisation des variables sur le conditionnement de la surface de coût et la convergence.
@@ -16,7 +16,7 @@ Ce projet individuel universitaire de **Mathématiques Appliquées et Machine Le
 
 ---
 
-## 📁 Structure du Repository
+## Structure du Repository
 
 ```text
 student-success-ml-from-scratch/
@@ -69,7 +69,7 @@ student-success-ml-from-scratch/
 
 ---
 
-## 🛠️ Installation & Exécution
+## Installation & Exécution
 
 ### 1. Cloner et Installer les Dépendances
 ```bash
@@ -95,10 +95,14 @@ python -m tests.compare_with_sklearn
 ```bash
 streamlit run app/app.py
 ```
+ou 
+```bash
+python -m streamlit run app/app.py
+```
 
 ---
 
-## 📊 Résultats Clés de Performance
+## Résultats Clés de Performance
 
 | Modèle | Accuracy Test | F1-Score Test | Log-Loss Final | ROC-AUC |
 | :--- | :---: | :---: | :---: | :---: |
