@@ -1,14 +1,17 @@
 """
-Preprocessing module containing functions for standardization and dataset split.
+Preprocessing module containing functions for standardization, dataset cleaning, and split.
 """
 
+import os
 import numpy as np
+import pandas as pd
 
 
 class StandardScalerScratch:
     """
     StandardScaler implemented from scratch using NumPy.
-    Standardizes features by removing the mean and scaling to unit variance.
+    Standardizes features by removing the mean and scaling to unit variance:
+    X_scaled = (X - mean) / std
     """
 
     def __init__(self):
@@ -36,9 +39,9 @@ class StandardScalerScratch:
         return self.fit(X).transform(X)
 
 
-def train_test_split_scratch(X, y, test_size=0.2, random_state=None):
+def train_test_split_scratch(X, y, test_size=0.2, random_state=42):
     """
-    Split arrays or matrices into random train and test subsets from scratch.
+    Split arrays or matrices into random train and test subsets from scratch using NumPy.
     """
     X_arr = np.asarray(X)
     y_arr = np.asarray(y)
@@ -57,3 +60,34 @@ def train_test_split_scratch(X, y, test_size=0.2, random_state=None):
     train_idx = indices[n_test:]
 
     return X_arr[train_idx], X_arr[test_idx], y_arr[train_idx], y_arr[test_idx]
+
+
+def prepare_and_save_data(raw_path="data/raw/student_data.csv", processed_dir="data/processed"):
+    """Load raw dataset, separate features/target, split, standardize, and save processed splits."""
+    df = pd.read_csv(raw_path)
+    X = df.drop(columns=["academic_success"]).values
+    y = df["academic_success"].values
+
+    X_train, X_test, y_train, y_test = train_test_split_scratch(X, y, test_size=0.2, random_state=42)
+
+    scaler = StandardScalerScratch()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    os.makedirs(processed_dir, exist_ok=True)
+    np.savez(
+        os.path.join(processed_dir, "dataset.npz"),
+        X_train=X_train,
+        X_test=X_test,
+        X_train_scaled=X_train_scaled,
+        X_test_scaled=X_test_scaled,
+        y_train=y_train,
+        y_test=y_test,
+        feature_names=df.drop(columns=["academic_success"]).columns.values
+    )
+    print(f"Prepared and saved processed dataset to {processed_dir}/dataset.npz")
+    return X_train_scaled, X_test_scaled, y_train, y_test
+
+
+if __name__ == "__main__":
+    prepare_and_save_data()
