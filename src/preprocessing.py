@@ -83,7 +83,7 @@ def prepare_and_save_data(raw_path="data/raw/student_data.csv", processed_dir="d
         X_test_scaled=X_test_scaled,
         y_train=y_train,
         y_test=y_test,
-        feature_names=df.drop(columns=["academic_success"]).columns.values
+        feature_names=np.array(df.drop(columns=["academic_success"]).columns, dtype=str)
     )
     print(f"Prepared and saved processed dataset to {processed_dir}/dataset.npz")
     return X_train_scaled, X_test_scaled, y_train, y_test

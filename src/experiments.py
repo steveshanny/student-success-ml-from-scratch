@@ -15,7 +15,7 @@ def experiment_learning_rates(data_path="data/processed/dataset.npz", output_dir
     - Alpha optimal (0.1)
     - Alpha too large (3.5)
     """
-    data = np.load(data_path)
+    data = np.load(data_path, allow_pickle=True)
     X_train_scaled = data["X_train_scaled"]
     y_train = data["y_train"]
 
@@ -46,7 +46,7 @@ def experiment_standardization(data_path="data/processed/dataset.npz", output_di
     """
     Compare convergence speed between scaled and unscaled feature representations.
     """
-    data = np.load(data_path)
+    data = np.load(data_path, allow_pickle=True)
     X_train_raw = data["X_train"]
     X_train_scaled = data["X_train_scaled"]
     y_train = data["y_train"]

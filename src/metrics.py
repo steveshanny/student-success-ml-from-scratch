@@ -89,7 +89,7 @@ def evaluate_model_pipeline(data_path="data/processed/dataset.npz", output_dir="
     """Evaluate trained Logistic Regression model and save confusion matrix, ROC curve, and metrics table."""
     from src.logistic_regression_scratch import LogisticRegressionScratch
 
-    data = np.load(data_path)
+    data = np.load(data_path, allow_pickle=True)
     X_train_scaled = data["X_train_scaled"]
     X_test_scaled = data["X_test_scaled"]
     y_train = data["y_train"]

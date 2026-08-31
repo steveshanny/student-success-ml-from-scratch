@@ -13,7 +13,7 @@ from src.metrics import accuracy_score_scratch, f1_score_scratch
 
 def compare_pca_on_dataset(data_path="data/processed/dataset.npz"):
     print("=== 1. COMPARAISON ACP (PCA) FROM SCRATCH VS REFERENCE ===")
-    data = np.load(data_path)
+    data = np.load(data_path, allow_pickle=True)
     X_train_scaled = data["X_train_scaled"]
 
     # PCA From Scratch

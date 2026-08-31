@@ -115,7 +115,7 @@ class LogisticRegressionScratch:
 
 def run_logistic_regression_pipeline(data_path="data/processed/dataset.npz", output_dir="results/figures"):
     """Fit logistic regression model on student dataset and plot convergence curve."""
-    data = np.load(data_path)
+    data = np.load(data_path, allow_pickle=True)
     X_train_scaled = data["X_train_scaled"]
     y_train = data["y_train"]
 

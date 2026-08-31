@@ -47,7 +47,7 @@ if not os.path.exists(PROCESSED_DATA_PATH):
     prepare_and_save_data()
 
 df_raw = pd.read_csv(RAW_DATA_PATH)
-data_processed = np.load(PROCESSED_DATA_PATH)
+data_processed = np.load(PROCESSED_DATA_PATH, allow_pickle=True)
 X_train_scaled = data_processed["X_train_scaled"]
 X_test_scaled = data_processed["X_test_scaled"]
 y_train = data_processed["y_train"]
