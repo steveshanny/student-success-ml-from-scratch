@@ -1,6 +1,8 @@
 # Student Success ML From Scratch
 
 > **Prédiction de la réussite académique des étudiants par Analyse en Composantes Principales (ACP) et Régression Logistique avec régularisation L2 : implémentation et analyse mathématique vectorisée from scratch avec NumPy.**
+>
+> **Données :** Ce projet utilise des données **synthétiques** générées avec les mêmes distributions que le dataset [UCI Student Performance](https://archive.ics.uci.edu/ml/datasets/Student+Performance). Les données réelles UCI ne sont pas distribuées avec ce projet.
 
 ---
 
@@ -23,14 +25,16 @@ student-success-ml-from-scratch/
 ├── README.md                          # Documentation générale du projet
 ├── requirements.txt                    # Dépendances du projet
 ├── .gitignore                          # Exclusions Git
+├── .streamlit/
+│   └── config.toml                     # Configuration Streamlit Cloud
 ├── data/
 │   ├── raw/
-│   │   └── student_data.csv            # Dataset brut UCI Student Performance (395 étudiants)
+│   │   └── student_data.csv            # Dataset synthétique (395 étudiants)
 │   └── processed/
 │       └── dataset.npz                 # Splits train/test et variables standardisées
 ├── src/
 │   ├── __init__.py
-│   ├── data_loader.py                  # Chargement et binarisation du dataset académique
+│   ├── data_loader.py                  # Génération du dataset synthétique
 │   ├── preprocessing.py               # StandardScalerScratch & train_test_split_scratch
 │   ├── pca_scratch.py                  # PCAFromScratch (décomposition spectrale)
 │   ├── logistic_regression_scratch.py  # LogisticRegressionScratch (Log-Loss L2 & Gradient)
@@ -50,8 +54,7 @@ student-success-ml-from-scratch/
 │   ├── 03_logistic_regression.ipynb
 │   └── final_project.ipynb             # Notebook scientifique principal (21 sections)
 ├── app/
-│   ├── app.py                          # Application Streamlit interactive
-│   └── components/
+│   └── app.py                          # Application Streamlit interactive
 ├── results/
 │   ├── figures/                        # Graphiques générés (Scree plot, 2D PCA, ROC, Loss)
 │   └── metrics/                        # Métriques CSV (EDA, Evaluation, Sklearn comparison)
