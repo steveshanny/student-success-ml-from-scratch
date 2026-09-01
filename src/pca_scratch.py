@@ -24,6 +24,13 @@ class PCAFromScratch:
         Assumes X is centered/standardized.
         """
         X_arr = np.asarray(X, dtype=np.float64)
+        if X_arr.ndim != 2:
+            raise ValueError(f"X must be 2D, got {X_arr.ndim}D")
+        if X_arr.shape[0] < 2:
+            raise ValueError("X must have at least 2 samples for covariance computation")
+        if self.n_components > X_arr.shape[1]:
+            raise ValueError(f"n_components ({self.n_components}) cannot exceed n_features ({X_arr.shape[1]})")
+
         m = X_arr.shape[0]
 
         # Covariance matrix: Sigma = (1/m) * X^T * X

@@ -48,14 +48,14 @@ def train_test_split_scratch(X, y, test_size=0.2, random_state=42):
 
     if len(X_arr) != len(y_arr):
         raise ValueError("X and y must have the same length.")
+    if not 0.0 < test_size < 1.0:
+        raise ValueError(f"test_size must be between 0 and 1 exclusive, got {test_size}")
 
     n_samples = len(X_arr)
     n_test = int(n_samples * test_size)
 
-    if random_state is not None:
-        np.random.seed(random_state)
-
-    indices = np.random.permutation(n_samples)
+    rng = np.random.RandomState(random_state)
+    indices = rng.permutation(n_samples)
     test_idx = indices[:n_test]
     train_idx = indices[n_test:]
 
