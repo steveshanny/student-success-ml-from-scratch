@@ -31,8 +31,10 @@ wheels/
 .vscode/
 .idea/
 
-# Streamlit
-.streamlit/
+# Streamlit (track config.toml but not secrets)
+.streamlit/*
+!.streamlit/config.toml
+.streamlit/secrets.toml
 
 # OS generated
 .DS_Store
