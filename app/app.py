@@ -35,18 +35,21 @@ st.title(" Prédiction de la Réussite Académique des Étudiants")
 st.markdown(
     "**Analyse en Composantes Principales (ACP) & Régression Logistique avec régularisation L2 — Implémentation From Scratch en NumPy**"
 )
+st.caption("Données synthétiques inspirées du dataset UCI Student Performance — Projet pédagogique à visée d'apprentissage.")
 
 # Data paths
 RAW_DATA_PATH = "data/raw/student_data.csv"
 PROCESSED_DATA_PATH = "data/processed/dataset.npz"
 
 if not os.path.exists(RAW_DATA_PATH):
-    from src.data_loader import generate_uci_student_dataset
-    generate_uci_student_dataset()
+    with st.spinner("Génération du dataset..."):
+        from src.data_loader import generate_uci_student_dataset
+        generate_uci_student_dataset()
 
 if not os.path.exists(PROCESSED_DATA_PATH):
-    from src.preprocessing import prepare_and_save_data
-    prepare_and_save_data()
+    with st.spinner("Prétraitement des données..."):
+        from src.preprocessing import prepare_and_save_data
+        prepare_and_save_data()
 
 df_raw = pd.read_csv(RAW_DATA_PATH)
 data_processed = np.load(PROCESSED_DATA_PATH, allow_pickle=True)
@@ -56,8 +59,48 @@ y_train = data_processed["y_train"]
 y_test = data_processed["y_test"]
 feature_names = data_processed["feature_names"]
 
+
+@st.cache_resource
+def get_default_model():
+    model = LogisticRegressionScratch(learning_rate=0.1, l2_lambda=0.1, n_iterations=1000)
+    model.fit(X_train_scaled, y_train)
+    return model
+
+
+@st.cache_resource
+def get_pca_model():
+    pca = PCAFromScratch(n_components=2)
+    pca.fit(X_train_scaled)
+    return pca
+
+
+@st.cache_resource
+def get_full_pca_model():
+    pca = PCAFromScratch(n_components=X_train_scaled.shape[1])
+    pca.fit(X_train_scaled)
+    return pca
+
+
+@st.cache_resource
+def get_scaler():
+    scaler = StandardScalerScratch()
+    scaler.fit(df_raw.drop(columns=["academic_success"]).values)
+    return scaler
+
+
+@st.cache_resource
+def get_trained_model_on_all_data():
+    scaler = get_scaler()
+    X_raw_all = df_raw.drop(columns=["academic_success"]).values
+    y_raw_all = df_raw["academic_success"].values
+    X_scaled_all = scaler.transform(X_raw_all)
+    model = LogisticRegressionScratch(learning_rate=0.1, l2_lambda=0.1, n_iterations=1000)
+    model.fit(X_scaled_all, y_raw_all)
+    return model, X_scaled_all
+
+
 # Sidebar Navigation
-st.sidebar.image("https://img.icons8.com/isometric-folders/100/graduation-cap.png", width=80)
+st.sidebar.title("🎓 Student Success ML")
 st.sidebar.title("Navigation")
 menu = st.sidebar.radio(
     "Accéder aux sections :",
@@ -72,9 +115,7 @@ if menu == "Dashboard":
     col2.metric("Variables (Features)", f"{len(feature_names)}")
     col3.metric("Taux de Réussite", f"{df_raw['academic_success'].mean() * 100:.1f}%")
 
-    # Fit default model for dashboard metrics
-    model_default = LogisticRegressionScratch(learning_rate=0.1, l2_lambda=0.1, n_iterations=1000)
-    model_default.fit(X_train_scaled, y_train)
+    model_default = get_default_model()
     preds_test = model_default.predict(X_test_scaled)
 
     acc = accuracy_score_scratch(y_test, preds_test)
@@ -89,11 +130,12 @@ if menu == "Dashboard":
         "Ce projet démontre l'implémentation vectorisée from scratch des algorithmes d'Analyse en Composantes Principales (ACP) "
         "et de Régression Logistique (avec régularisation L2 et descente de gradient) en NumPy, appliqués à la prédiction de la réussite académique."
     )
+    st.caption("Les données sont générées synthétiquement. Le but est de comprendre les mécanismes internes des algorithmes ML sans utiliser de bibliothèque ML prête-à-l'emploi.")
 
 # 2. DATASET
 elif menu == "Dataset":
     st.header("Exploration des Données Académiques")
-    st.subheader("Aperçu du Dataset Brut (UCI Student Performance)")
+    st.subheader("Aperçu du Dataset (synthétique, inspiré UCI Student Performance)")
     st.dataframe(df_raw.head(10), use_container_width=True)
 
     col1, col2 = st.columns(2)
@@ -113,8 +155,10 @@ elif menu == "Dataset":
 # 3. ACP (PCA)
 elif menu == "ACP (PCA)":
     st.header("Analyse en Composantes Principales (ACP) From Scratch")
-    pca = PCAFromScratch(n_components=2)
-    Z = pca.fit_transform(X_train_scaled)
+
+    with st.spinner("Calcul de l'ACP..."):
+        pca = get_pca_model()
+        Z = pca.transform(X_train_scaled)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -129,8 +173,7 @@ elif menu == "ACP (PCA)":
 
     with col2:
         st.subheader("Ratio de Variance Expliquée")
-        full_pca = PCAFromScratch(n_components=X_train_scaled.shape[1])
-        full_pca.fit(X_train_scaled)
+        full_pca = get_full_pca_model()
         cum_var = np.cumsum(full_pca.explained_variance_ratio_)
 
         fig, ax = plt.subplots(figsize=(7, 5))
@@ -153,8 +196,9 @@ elif menu == "Entraînement":
     l2_lambda = st.sidebar.slider("Régularisation L2 (lambda)", 0.0, 5.0, 0.1, step=0.1)
     n_iters = st.sidebar.slider("Nombre d'itérations", 50, 2000, 1000, step=50)
 
-    model = LogisticRegressionScratch(learning_rate=lr, l2_lambda=l2_lambda, n_iterations=n_iters)
-    model.fit(X_train_scaled, y_train)
+    with st.spinner(f"Entraînement en cours ({n_iters} itérations)..."):
+        model = LogisticRegressionScratch(learning_rate=lr, l2_lambda=l2_lambda, n_iterations=n_iters)
+        model.fit(X_train_scaled, y_train)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -179,11 +223,10 @@ elif menu == "Entraînement":
 elif menu == "Évaluation":
     st.header("Évaluation des Performances de Classification")
 
-    model = LogisticRegressionScratch(learning_rate=0.1, l2_lambda=0.1, n_iterations=1000)
-    model.fit(X_train_scaled, y_train)
-
-    preds_test = model.predict(X_test_scaled)
-    probs_test = model.predict_proba(X_test_scaled)
+    with st.spinner("Entraînement du modèle d'évaluation..."):
+        model = get_default_model()
+        preds_test = model.predict(X_test_scaled)
+        probs_test = model.predict_proba(X_test_scaled)
 
     acc = accuracy_score_scratch(y_test, preds_test)
     prec = precision_score_scratch(y_test, preds_test)
@@ -227,15 +270,9 @@ elif menu == "Prédiction Individuelle":
     st.header("Simulation de Prédiction pour un Étudiant")
     st.markdown("Ajustez les caractéristiques de l'étudiant pour simuler son estimation de réussite académique :")
 
-    scaler = StandardScalerScratch()
-    scaler.fit(df_raw.drop(columns=["academic_success"]).values)
-
-    X_raw_all = df_raw.drop(columns=["academic_success"]).values
-    y_raw_all = df_raw["academic_success"].values
-    X_scaled_all = scaler.transform(X_raw_all)
-
-    model = LogisticRegressionScratch(learning_rate=0.1, l2_lambda=0.1, n_iterations=1000)
-    model.fit(X_scaled_all, y_raw_all)
+    with st.spinner("Chargement du modèle..."):
+        model_full, _ = get_trained_model_on_all_data()
+        scaler = get_scaler()
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -262,8 +299,8 @@ elif menu == "Prédiction Individuelle":
     input_data = np.array([[age, medu, fedu, traveltime, studytime, failures, famrel, freetime, goout, dalc, walc, health, absences, g1, g2]])
     input_scaled = scaler.transform(input_data)
 
-    proba = model.predict_proba(input_scaled)[0]
-    pred_class = model.predict(input_scaled)[0]
+    proba = model_full.predict_proba(input_scaled)[0]
+    pred_class = model_full.predict(input_scaled)[0]
 
     st.markdown("---")
     st.subheader("Résultat de la Prédiction Explicable")
@@ -278,4 +315,4 @@ elif menu == "Prédiction Individuelle":
         else:
             st.error("**Classe Prédite : Non-réussite Académique**")
 
-    st.warning("**Avertissement Légal & Académique :** Cette prédiction est issue d'un modèle expérimental à visée pédagogique et ne constitue en aucun cas une décision académique réelle ou un diagnostic d'orientation.")
+    st.warning("**Avertissement :** Cette prédiction est issue d'un modèle expérimental à visée pédagogique (données synthétiques) et ne constitue en aucun cas une décision académique réelle ou un diagnostic d'orientation.")
